@@ -64,18 +64,4 @@ pub mod test_helpers {
         );
         DynamoDbClient::new_with(HttpClient::new().unwrap(), credential, region)
     }
-
-    #[tokio::test]
-    async fn test() {
-        let cli = SimpleClientA {
-            cli: DynamoDbClient::new(Region::UsEast1),
-        };
-
-        let inserted = cli.insert(("a", "b"), Content { content: 123 }).await;
-        assert!(inserted.is_ok());
-
-        let got = cli.get(("a", "b")).await;
-        assert!(got.is_ok());
-        assert_eq!(got.unwrap().content, 123);
-    }
 }
