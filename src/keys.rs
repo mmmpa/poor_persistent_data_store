@@ -122,11 +122,3 @@ mod tests {
         gen(("a", 1.0));
     }
 }
-
-struct X {}
-
-impl Into<(String, String)> for X {
-    fn into(self) -> (String, String) {
-        unimplemented!()
-    }
-}

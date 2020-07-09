@@ -1,5 +1,5 @@
 use crate::error::DshmError;
-use crate::{CanQueryKey, Key, Keys, S};
+use crate::{CanQueryKey, DshmResult, Key, Keys, S};
 
 use async_trait::async_trait;
 use rusoto_dynamodb::{
@@ -52,15 +52,12 @@ pub trait DynamoSimpleHashMap {
         o?.remove(&self.data_attribute())?.s
     }
 
-    fn retrieve(
-        &self,
-        o: Option<HashMap<String, AttributeValue>>,
-    ) -> Result<Self::Data, DshmError> {
+    fn retrieve(&self, o: Option<HashMap<String, AttributeValue>>) -> DshmResult<Self::Data> {
         let raw = self.pick_data(o).ok_or(DshmError::NoItem)?;
         Ok(serde_json::from_str(&raw)?)
     }
 
-    async fn insert(&self, key: Self::Key, data: Self::Data) -> Result<(), DshmError> {
+    async fn insert(&self, key: Self::Key, data: Self::Data) -> DshmResult<()> {
         let mut item = self.build_base_item(key);
 
         item.insert(
@@ -84,7 +81,7 @@ pub trait DynamoSimpleHashMap {
         &self,
         key: Self::Key,
         consistent_read: Option<bool>,
-    ) -> Result<Self::Data, DshmError> {
+    ) -> DshmResult<Self::Data> {
         let item = GetItemInput {
             table_name: self.table_name(),
             key: self.build_base_item(key),
@@ -99,15 +96,15 @@ pub trait DynamoSimpleHashMap {
         self.retrieve(o.item)
     }
 
-    async fn get_strongly(&self, key: Self::Key) -> Result<Self::Data, DshmError> {
+    async fn get_strongly(&self, key: Self::Key) -> DshmResult<Self::Data> {
         self.get_base(key, Some(true)).await
     }
 
-    async fn get(&self, key: Self::Key) -> Result<Self::Data, DshmError> {
+    async fn get(&self, key: Self::Key) -> DshmResult<Self::Data> {
         self.get_base(key, None).await
     }
 
-    async fn query(&self, key: Key, limit: i64) -> Result<Vec<Self::Data>, DshmError>
+    async fn query(&self, key: Key, limit: i64) -> DshmResult<Vec<Self::Data>>
     where
         Self::Key: CanQueryKey,
     {
@@ -151,7 +148,7 @@ pub trait DynamoSimpleHashMap {
         Ok(data)
     }
 
-    async fn remove(&self, key: Self::Key) -> Result<Self::Data, DshmError> {
+    async fn remove(&self, key: Self::Key) -> DshmResult<Self::Data> {
         let o = self
             .dynamo_db()
             .delete_item(DeleteItemInput {

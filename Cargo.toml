@@ -16,7 +16,7 @@ serde_json = "1.0"
 log = "0.4.8"
 
 [dev-dependencies]
-rs_ttb = { path = "../rs_test_tool_box" }
+rs_ttb = { git = "https://github.com/mmmpa/rs_test_tool_box" }
 rusoto_credential = "0.44.0"
 tokio = { version = "0.2.21", features = ["full"] }
 pretty_env_logger = "0.4"

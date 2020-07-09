@@ -12,6 +12,8 @@ pub use error::*;
 pub use keys::*;
 pub use test_helpers::*;
 
+pub type DshmResult<T> = Result<T, DshmError>;
+
 #[cfg(test)]
 mod tests {
     use crate::test_helpers::test_helpers::{
